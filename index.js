@@ -27,15 +27,29 @@ async function setupServer() {
     const productsCollection = client.db('productsDB').collection('products');
     const categoriesCollection = client.db('productsDB').collection('categories');
 
+    app.get('/products', async (req, res) => {
+      const cursor = productsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get('/products/:brandName', async (req, res) => {
+      const categoryName = req.params.brandName; 
+      const query = { brand: categoryName };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post('/products', async (req, res) => {
       const newProduct = req.body;
       const result = await productsCollection.insertOne(newProduct);
       res.send(result);
     });
+
     app.get('/categories', async (req, res) => {
-         const categories = await categoriesCollection.find({}).toArray();
-        res.json(categories);
-    })
+      const categories = await categoriesCollection.find({}).toArray();
+      res.json(categories);
+    });
 
     app.get('/', (req, res) => {
       res.send('Brand Shop server is running');
